@@ -91,14 +91,13 @@ public class SuperAdminPanel extends JFrame {
         grid.add(makeCard("💰", "Income/Expense",   "Manage finance",             new Color(0,150,255), e -> new FinancePanel()));
         grid.add(makeCard("📈", "Reports",          "View system reports",        new Color(255,140,0), e -> new ReportPanel(studentManager)));
 
-        grid.add(makeCard("💻", "Online Course",    "Manage online courses",      new Color(0,180,220), e -> new OnlineCoursePanel()));
-        grid.add(makeCard("📝", "Online Exam",      "Create & manage exams",      new Color(180,80,255),e -> new OnlineExamPanel()));
+        grid.add(makeCard("💻", "Online Course",    "Manage online courses",      new Color(0,180,220), e -> { dispose(); new OnlineCoursePanel(true, studentManager, teacherManager); }));
+        grid.add(makeCard("📝", "Online Exam",      "Create & manage exams",      new Color(180,80,255),e -> { dispose(); new OnlineExamPanel(true, studentManager, teacherManager); }));
         grid.add(makeCard("📋", "Behaviour/Result", "Add results & behaviour",    new Color(255,100,150),e -> new BehaviourResultPanel(studentManager)));
 
         grid.add(makeCard("🧑‍💼", "HR / Staff",     "Staff info & attendance",   new Color(100,100,220),e -> new StaffPanel()));
         grid.add(makeCard("📄", "CV/Certificates",  "Generate CV & certificates",  new Color(0,150,150), e -> new CVCertificatePanel(studentManager)));
-        grid.add(makeCard("📅", "Annual Calendar",  "Manage school calendar",      new Color(180,120,0), e -> new AnnualCalendarPanel()));
-
+        grid.add(makeCard("📅", "Annual Calendar",  "Manage school calendar",      new Color(180,120,0), e -> { dispose(); new AnnualCalendarPanel(true, studentManager, teacherManager); }));
         wrapper.add(grid);
 
         JPanel outer = new JPanel(new BorderLayout());

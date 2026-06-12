@@ -6,15 +6,18 @@ public class OnlineExamPanel extends JFrame {
     DefaultListModel<String> model = new DefaultListModel<>();
     JList<String> list = new JList<>(model);
     String FILE = "exams.txt";
+    boolean editable;
 
-    OnlineExamPanel(){
-        setTitle("Online Exam");
+    OnlineExamPanel(boolean editable, StudentManager sm, TeacherManager tm){
+        this.editable = editable;
+
+        setTitle("Online Exam" + (editable ? " (Edit Mode)" : " (View Only)"));
         setSize(800,600);
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        JLabel title = new JLabel("📝 ONLINE EXAM MANAGEMENT", SwingConstants.CENTER);
+        JLabel title = new JLabel("📝 ONLINE EXAM MANAGEMENT" + (editable ? "" : " - VIEW ONLY"), SwingConstants.CENTER);
         title.setFont(new Font("Arial",Font.BOLD,24));
         title.setOpaque(true);
         title.setBackground(new Color(0,80,160));
@@ -28,26 +31,32 @@ public class OnlineExamPanel extends JFrame {
         JPanel bottom = new JPanel(new FlowLayout());
         bottom.setBackground(new Color(30,30,30));
 
-        JButton createExam = btn("➕ Create Exam", new Color(0,180,100));
-        JButton deleteExam = btn("🗑 Delete Exam", new Color(220,60,60));
-        JButton submitMarks = btn("📤 Submit Marks", new Color(180,80,255));
-        JButton viewResults = btn("📊 View Results", new Color(0,140,220));
-        JButton back = DashboardButtons.backButton(this);
+        if(editable){
+            JButton createExam = btn("➕ Create Exam", new Color(0,180,100));
+            JButton deleteExam = btn("🗑 Delete Exam", new Color(220,60,60));
+            JButton submitMarks = btn("📤 Submit Marks", new Color(180,80,255));
+            createExam.addActionListener(e -> createExam());
+            deleteExam.addActionListener(e -> deleteExam());
+            submitMarks.addActionListener(e -> submitMarks());
+            bottom.add(createExam);
+            bottom.add(deleteExam);
+            bottom.add(submitMarks);
+        }
 
-        bottom.add(createExam);
-        bottom.add(deleteExam);
-        bottom.add(submitMarks);
+        JButton viewResults = btn("📊 View Results", new Color(0,140,220));
+        viewResults.addActionListener(e -> viewResults());
         bottom.add(viewResults);
+
+        JButton back;
+        if(editable){
+            back = DashboardButtons.backToSuperAdmin(this, sm, tm);
+        } else {
+            back = DashboardButtons.backButton(this);
+        }
         bottom.add(back);
         add(bottom, BorderLayout.SOUTH);
 
         loadExams();
-
-        createExam.addActionListener(e -> createExam());
-        deleteExam.addActionListener(e -> deleteExam());
-        submitMarks.addActionListener(e -> submitMarks());
-        viewResults.addActionListener(e -> viewResults());
-
         setVisible(true);
     }
 
@@ -130,6 +139,7 @@ public class OnlineExamPanel extends JFrame {
     }
 
     void loadExams(){
+        model.clear();
         try{
             File f = new File(FILE);
             if(!f.exists()) return;

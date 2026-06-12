@@ -6,15 +6,18 @@ public class OnlineCoursePanel extends JFrame {
     DefaultListModel<String> model = new DefaultListModel<>();
     JList<String> courseList = new JList<>(model);
     String FILE = "courses.txt";
+    boolean editable;
 
-    OnlineCoursePanel(){
-        setTitle("Online Courses");
+    OnlineCoursePanel(boolean editable, StudentManager sm, TeacherManager tm){
+        this.editable = editable;
+
+        setTitle("Online Courses" + (editable ? " (Edit Mode)" : " (View Only)"));
         setSize(800,600);
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        JLabel title = new JLabel("💻 ONLINE COURSE MANAGEMENT", SwingConstants.CENTER);
+        JLabel title = new JLabel("💻 ONLINE COURSE MANAGEMENT" + (editable ? "" : " - VIEW ONLY"), SwingConstants.CENTER);
         title.setFont(new Font("Arial",Font.BOLD,24));
         title.setOpaque(true);
         title.setBackground(new Color(0,100,180));
@@ -28,26 +31,33 @@ public class OnlineCoursePanel extends JFrame {
         JPanel bottom = new JPanel(new FlowLayout());
         bottom.setBackground(new Color(30,30,30));
 
-        JButton addBtn = btn("➕ Add Course", new Color(0,180,100));
-        JButton delBtn = btn("🗑 Delete Course", new Color(220,60,60));
+        if(editable){
+            JButton addBtn = btn("➕ Add Course", new Color(0,180,100));
+            JButton delBtn = btn("🗑 Delete Course", new Color(220,60,60));
+            addBtn.addActionListener(e -> addCourse());
+            delBtn.addActionListener(e -> deleteCourse());
+            bottom.add(addBtn);
+            bottom.add(delBtn);
+        }
+
+        // Enroll & View Enrollments available to everyone
         JButton enrollBtn = btn("📝 Enroll Student", new Color(180,80,255));
         JButton viewEnrollBtn = btn("👥 View Enrollments", new Color(0,140,220));
-        JButton back = DashboardButtons.backButton(this);
-
-        bottom.add(addBtn);
-        bottom.add(delBtn);
+        enrollBtn.addActionListener(e -> enrollStudent());
+        viewEnrollBtn.addActionListener(e -> viewEnrollments());
         bottom.add(enrollBtn);
         bottom.add(viewEnrollBtn);
+
+        JButton back;
+        if(editable){
+            back = DashboardButtons.backToSuperAdmin(this, sm, tm);
+        } else {
+            back = DashboardButtons.backButton(this);
+        }
         bottom.add(back);
         add(bottom, BorderLayout.SOUTH);
 
         loadCourses();
-
-        addBtn.addActionListener(e -> addCourse());
-        delBtn.addActionListener(e -> deleteCourse());
-        enrollBtn.addActionListener(e -> enrollStudent());
-        viewEnrollBtn.addActionListener(e -> viewEnrollments());
-
         setVisible(true);
     }
 
@@ -130,6 +140,7 @@ public class OnlineCoursePanel extends JFrame {
     }
 
     void loadCourses(){
+        model.clear();
         try{
             File f = new File(FILE);
             if(!f.exists()) return;

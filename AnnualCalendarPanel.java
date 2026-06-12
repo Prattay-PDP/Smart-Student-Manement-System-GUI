@@ -6,15 +6,20 @@ public class AnnualCalendarPanel extends JFrame {
     DefaultListModel<String> model = new DefaultListModel<>();
     JList<String> list = new JList<>(model);
     String FILE = "calendar.txt";
+    boolean editable;
 
-    AnnualCalendarPanel(){
-        setTitle("Annual Calendar");
+    // editable = true -> Super Admin (full access)
+    // editable = false -> Main Login (view only)
+    AnnualCalendarPanel(boolean editable, StudentManager sm, TeacherManager tm){
+        this.editable = editable;
+
+        setTitle("Annual Calendar" + (editable ? " (Edit Mode)" : " (View Only)"));
         setSize(750,600);
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        JLabel title = new JLabel("📅 ANNUAL CALENDAR", SwingConstants.CENTER);
+        JLabel title = new JLabel("📅 ANNUAL CALENDAR" + (editable ? "" : " - VIEW ONLY"), SwingConstants.CENTER);
         title.setFont(new Font("Arial",Font.BOLD,24));
         title.setOpaque(true);
         title.setBackground(new Color(160,80,0));
@@ -28,20 +33,25 @@ public class AnnualCalendarPanel extends JFrame {
         JPanel bottom = new JPanel(new FlowLayout());
         bottom.setBackground(new Color(30,30,30));
 
-        JButton addEvent = btn("➕ Add Event", new Color(0,180,100));
-        JButton delEvent = btn("🗑 Delete Event", new Color(220,60,60));
-        JButton back = DashboardButtons.backButton(this);
+        if(editable){
+            JButton addEvent = btn("➕ Add Event", new Color(0,180,100));
+            JButton delEvent = btn("🗑 Delete Event", new Color(220,60,60));
+            addEvent.addActionListener(e -> addEvent());
+            delEvent.addActionListener(e -> deleteEvent());
+            bottom.add(addEvent);
+            bottom.add(delEvent);
+        }
 
-        bottom.add(addEvent);
-        bottom.add(delEvent);
+        JButton back;
+        if(editable){
+            back = DashboardButtons.backToSuperAdmin(this, sm, tm);
+        } else {
+            back = DashboardButtons.backButton(this);
+        }
         bottom.add(back);
         add(bottom, BorderLayout.SOUTH);
 
         loadEvents();
-
-        addEvent.addActionListener(e -> addEvent());
-        delEvent.addActionListener(e -> deleteEvent());
-
         setVisible(true);
     }
 
@@ -77,6 +87,7 @@ public class AnnualCalendarPanel extends JFrame {
     }
 
     void loadEvents(){
+        model.clear();
         try{
             File f = new File(FILE);
             if(!f.exists()) return;

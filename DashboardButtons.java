@@ -3,44 +3,40 @@ import java.awt.*;
 
 public class DashboardButtons {
 
-    static JButton makeButton(String text, Color color) {
-        JButton b = new JButton(text);
-        b.setBackground(color);
-        b.setForeground(Color.WHITE);
-        b.setFont(new Font("Arial", Font.BOLD, 18));
-        b.setFocusPainted(false);
-        return b;
-    }
-
-    static JButton line() {
-        JButton l = new JButton("--------------");
-        l.setEnabled(false);
-        return l;
-    }
-
-    static JButton backButton(JFrame frame, StudentManager manager) {
-        JButton back = new JButton("⬅ BACK TO LOGIN");
+    // Generic Back Button: dispose current frame and run a custom action
+    static JButton backButton(JFrame frame, Runnable onBack) {
+        JButton back = new JButton("⬅ BACK");
         back.setBackground(new Color(255, 120, 0));
         back.setForeground(Color.WHITE);
         back.setFont(new Font("Arial", Font.BOLD, 16));
         back.setFocusPainted(false);
+
         back.addActionListener(e -> {
             frame.dispose();
-            AppController.goToLogin();
+            onBack.run();
         });
+
         return back;
     }
 
+    // Back to Main Login (used from ModernLoginUI's feature panels)
     static JButton backButton(JFrame frame) {
-        JButton back = new JButton("⬅ BACK TO LOGIN");
-        back.setBackground(new Color(255, 120, 0));
+        return backButton(frame, () -> AppController.goToLogin());
+    }
+
+    // Back to Super Admin Panel
+    static JButton backToSuperAdmin(JFrame frame, StudentManager sm, TeacherManager tm) {
+        JButton back = new JButton("⬅ BACK TO SUPER ADMIN");
+        back.setBackground(new Color(130, 0, 220));
         back.setForeground(Color.WHITE);
         back.setFont(new Font("Arial", Font.BOLD, 16));
         back.setFocusPainted(false);
+
         back.addActionListener(e -> {
             frame.dispose();
-            AppController.goToLogin();
+            new SuperAdminPanel(sm, tm);
         });
+
         return back;
     }
 }

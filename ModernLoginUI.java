@@ -108,6 +108,11 @@ public class ModernLoginUI extends JFrame {
         grid.add(makeCard("📖",  "Librarian",      "Library management",      C_LIBRARIAN,    e -> librarianLogin()));
         grid.add(makeCard("📋",  "Receptionist",   "Front desk operations",   C_RECEPTIONIST, e -> receptionistLogin()));
         grid.add(makeCard("💰",  "Accountant",     "Manage student accounts", C_ACCOUNTANT,   e -> accountantLogin()));
+       grid.add(makeCard("📅", "Calendar",  "View Annual Calendar",     new Color(180,120,0), e -> { dispose(); new AnnualCalendarPanel(false, manager, AppController.teacherManager); }));
+grid.add(makeCard("💻", "Courses",   "View Online Courses",      new Color(0,180,220), e -> { dispose(); new OnlineCoursePanel(false, manager, AppController.teacherManager); }));
+grid.add(makeCard("📝", "Exam Results","View Exam Results",      new Color(180,80,255),e -> { dispose(); new OnlineExamPanel(false, manager, AppController.teacherManager); }));
+
+       
         grid.add(makeCard("⏻",   "Exit",           "Close application",       C_EXIT,         e -> System.exit(0)));
 
         wrapper.add(grid);
